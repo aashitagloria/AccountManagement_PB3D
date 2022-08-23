@@ -6,7 +6,7 @@ import javax.persistence.OneToOne;
 
 /** 
  * entity class for User database table
- * @author dakshin
+ 
  *
  */
 
