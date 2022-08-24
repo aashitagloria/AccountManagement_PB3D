@@ -40,7 +40,7 @@ public class ManagerController {
 
 	/**
 	 * create a new online account for customer
-	 * @author tanvi
+	 * @author Tanvi
 	 * 
 	 * @param panCard
 	 * @param aadharNumber
