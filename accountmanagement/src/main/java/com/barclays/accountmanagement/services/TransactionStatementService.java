@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.barclays.accountmanagement.entity.Transaction;
 
-
 public interface TransactionStatementService {
 	
 	 

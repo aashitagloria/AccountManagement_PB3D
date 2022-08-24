@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import com.barclays.accountmanagement.entity.Transaction;
 
-
 @Repository
 public interface TransactionRepo extends JpaRepository<Transaction, Integer>{
 
