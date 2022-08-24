@@ -40,7 +40,7 @@ public class ManagerController {
 
 	/**
 	 * create a new online account for customer
-	 * @author dakshin
+	 * @author tanvi
 	 * 
 	 * @param panCard
 	 * @param aadharNumber
@@ -110,7 +110,7 @@ public class ManagerController {
 
 	/**
 	 * Create savings account for a particular customer
-	 * @author nishad
+	 * @author Jaypal
 	 * 
 	 * @param customerId
 	 * @return accountNumber
@@ -131,7 +131,7 @@ public class ManagerController {
 	}
 
 	/**
-	 * @author
+	 * @author Jaypal
 	 * 
 	 * @param panCardNumber
 	 * @return account already exists or not and customerId
