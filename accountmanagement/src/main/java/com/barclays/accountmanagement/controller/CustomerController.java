@@ -1,4 +1,4 @@
-package com.barclays.accountmanagement.controllers;
+package com.barclays.accountmanagement.controller;
 
 import java.util.HashMap;
 import java.util.Set;
