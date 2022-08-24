@@ -7,6 +7,11 @@ import javax.persistence.Id;
 
 
 //import org.springframework.boot.autoconfigure.domain.EntityScan;
+/**
+ * Role - Role Entity mapped to Role table in database
+ * @author Rohini
+ *
+ */
 
 @Entity
 public class Role {
