@@ -6,6 +6,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.barclays.accountmanagement.utility.LoggingAspect;
+
 @Service 
 @Component
 public class EmailSender {
@@ -14,12 +16,15 @@ public class EmailSender {
 	public void sendEmail(String toEmail,String subject,String body)
 	{
 		SimpleMailMessage msg=new SimpleMailMessage();
-		System.out.println(msg);
+		//System.out.println(msg);
 		msg.setFrom("acc.management.system@gmail.com");
 		msg.setTo(toEmail);
 		msg.setText(body);
 		msg.setSubject(subject); 
-		System.out.println(msg);
+		//System.out.println(msg);
+		LoggingAspect.LOGGER.info(msg);
 		mailSender.send(msg);
-		System.out.println("Mail sent succesfully.."); }
+		LoggingAspect.LOGGER.info("Mail sent succesfully..");
+		//System.out.println("Mail sent succesfully.."); 
+		}
 	}

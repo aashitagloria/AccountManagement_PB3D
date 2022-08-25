@@ -1,10 +1,13 @@
 package com.barclays.accountmanagement.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.barclays.accountmanagement.constants.SystemConstants;
 
 import com.barclays.accountmanagement.entity.Transaction;
 import com.barclays.accountmanagement.services.TransactionService;
@@ -37,11 +39,13 @@ public class TransactionController {
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping(SystemConstants.GET_CURRENT_BALANCE)
-	public Long getCurrentBalance(@PathVariable long id) {
-		
+	@RequestMapping("api/transaction/getCurrentBalance/{id}")
+	public  ResponseEntity<Object> getCurrentBalance(@PathVariable long id) {
+		HashMap<String, Long> resultSet = new HashMap<String, Long>();
 		Long currentBalance = transactionService.getCurrentBalance(id);
-	    return currentBalance; 
+		resultSet.put("Current Balance", currentBalance);
+		return new ResponseEntity<>(resultSet, HttpStatus.OK);
+	    //return currentBalance; 
 	}
 	
 	/**
@@ -50,11 +54,15 @@ public class TransactionController {
 	 * @param amount
 	 * @return
 	 */
-	@GetMapping(SystemConstants.UPDATE_CURRENT_BALANCE)
-	public Long updateCurrentBalance(@PathVariable long id, @PathVariable long amount) {
+	@GetMapping("api/transaction/withdraw/{id}/{amount}")
+	public ResponseEntity<Object> updateCurrentBalance(@PathVariable long id, @PathVariable long amount) {
 		
 		Long currentBalance = transactionService.DeductMoney(id,amount);
-	    return currentBalance;
+		HashMap<String, Long> resultSet = new HashMap<String, Long>();
+		
+		resultSet.put("Current Balance", currentBalance);
+		return new ResponseEntity<>(resultSet, HttpStatus.OK);
+	   // return currentBalance;
 	}
 	
 
@@ -64,10 +72,14 @@ public class TransactionController {
 	 * @param amount
 	 * @return
 	 */
-	@PostMapping(SystemConstants.DEPOSIT_MONEY)
-	public String DepositMoney(@PathVariable long depositID,@PathVariable double amount)
+	@PostMapping("api/transaction/deposit/{depositID}/{amount}")
+	public ResponseEntity<Object> DepositMoney(@PathVariable long depositID,@PathVariable double amount)
 	{
-		return transactionService.Deposit(depositID,amount);
+		
+        HashMap<String, String> resultSet = new HashMap<String, String>();
+		
+		resultSet.put("Current Balance",  transactionService.Deposit(depositID,amount));
+		return new ResponseEntity<>(resultSet, HttpStatus.OK);
 	}
 	
 	
@@ -76,11 +88,15 @@ public class TransactionController {
 	 * @param transferData
 	 * @return
 	 */
-	@PostMapping(SystemConstants.TRANSFER_MONEY)
-	public String transferMoney(@RequestParam(value = "senderId") Integer SenderId,@RequestParam(value = "receiverId") Integer ReceiverId, 
+	@PostMapping(value = "api/transaction/transfer")
+	public ResponseEntity<Object> transferMoney(@RequestParam(value = "senderId") Integer SenderId,@RequestParam(value = "receiverId") Integer ReceiverId, 
 			@RequestParam(value = "amount") Integer amount )
 	{	
-		return transactionService.Transfer(SenderId,amount,ReceiverId);
+		  HashMap<String, String> resultSet = new HashMap<String, String>();
+			
+			resultSet.put("Current Balance",  transactionService.Transfer(SenderId,amount,ReceiverId));
+			return new ResponseEntity<>(resultSet, HttpStatus.OK);
+		
 	}
 	
 	/**
@@ -88,7 +104,7 @@ public class TransactionController {
 	 * @param accountNum
 	 * @return
 	 */
-	@GetMapping(SystemConstants.CHECK_HISTORY)
+	@GetMapping("api/transaction/recent/{accountNum}")
 	public List<Transaction> checkHistory(@PathVariable long accountNum)
 	{
 		return transactionService.checkHistory(accountNum);

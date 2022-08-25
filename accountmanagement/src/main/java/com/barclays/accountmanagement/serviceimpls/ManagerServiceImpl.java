@@ -1,6 +1,5 @@
 package com.barclays.accountmanagement.serviceimpls;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import com.barclays.accountmanagement.entity.Customer;
 import com.barclays.accountmanagement.repositories.AccountRepository;
 import com.barclays.accountmanagement.repositories.CustomerRepository;
 import com.barclays.accountmanagement.services.ManagerService;
+import com.barclays.accountmanagement.utility.LoggingAspect;
 
 
 
@@ -27,22 +27,21 @@ public class ManagerServiceImpl implements ManagerService{
 
 	/**
 	 * createNewAccount ( Create new customer saving account )
-	 * @author Nishad
+	 * @author Jaypal
 	 */
 	
 	public Account createNewAccount(int customerId) throws Exception{
 		Account account = new Account();
-		System.out.println(customerId);
+		//System.out.println(customerId);
 		Customer customer = customerRepository.findById(customerId).get();
-		System.out.println(customer.getName());
+		//System.out.println(customer.getName());
 		account.setCurrentBalance(100000);
 		account.setCustomer(customer);
 		account.setDailyLimit(10000);
-		// when transaction API completes
-     //   account.setTransactions(new ArrayList<Transaction>());    
-		System.out.println(account.getCurrentBalance());
+		
 		try {
 			account = accountRepository.save(account);
+			LoggingAspect.LOGGER.info("Account has been created with Account Number-"+account.getAccountNumber());
 		}catch(Exception e) {
 			throw e;
 		}
@@ -51,11 +50,12 @@ public class ManagerServiceImpl implements ManagerService{
 
 	/**
 	 * method to create a customer account and save it to db
-	 * @author dakshin
+	 * 
 	 */
 	
 	public Customer createNewCustomer(Customer customer) throws Exception{
 		try {
+			if(checkUserExist(customer.getPanCard()))
 			customer = customerRepository.save(customer);
 		}catch(Exception e){
 			throw e;
@@ -83,7 +83,17 @@ public class ManagerServiceImpl implements ManagerService{
 			return new ResponseEntity<>(result,HttpStatus.NOT_FOUND);
 		}
 	}
+	public boolean checkUserExist(String panCardNumber)
+	{
+		Customer customer = customerRepository.findCustomerByPanCard(panCardNumber);
+		if(customer!=null)
+		{
+			return false;
+		}else
+		{
+			return true;
+		}
+	}
 
 
 }
-

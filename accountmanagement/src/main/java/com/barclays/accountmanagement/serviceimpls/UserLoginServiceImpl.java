@@ -8,13 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.barclays.accountmanagement.entity.User;
 import com.barclays.accountmanagement.repositories.RoleRepository;
 import com.barclays.accountmanagement.repositories.UserLoginRepository;
 import com.barclays.accountmanagement.services.UserLoginService;
+import com.barclays.accountmanagement.utility.CustomPasswordEncoder;
+import com.barclays.accountmanagement.utility.LoggingAspect;
 
-import com.barclays.accountmanagement.entity.User;
-
-import com.barclays.accountmanagement.serviceimpls.CustomPasswordEncoder;
 
 
 @Service
@@ -28,7 +28,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 	
 	/**
 	 * verifyUserCredential ( verify user name and pasword )
-	 * @author 
+	 * 
 	 */
 	
 	CustomPasswordEncoder passwordEncoder = new CustomPasswordEncoder();
@@ -55,7 +55,8 @@ public class UserLoginServiceImpl implements UserLoginService {
 				return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
 			}
 		} catch(Exception e) {
-			System.out.println("Invalid User");
+			LoggingAspect.LOGGER.info("Invalid User "+e.getMessage());
+			//System.out.println("Invalid User");
 			result.put("message","Invalid User");
 			return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
 		}

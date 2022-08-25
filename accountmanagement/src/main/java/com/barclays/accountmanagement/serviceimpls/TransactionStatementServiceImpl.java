@@ -13,11 +13,6 @@ import com.barclays.accountmanagement.repositories.AccountRepository;
 import com.barclays.accountmanagement.repositories.TransactionRepository;
 import com.barclays.accountmanagement.services.TransactionStatementService;
 
-//import com.bank.accountmanagementsystem.models.Account;
-//import com.bank.accountmanagementsystem.models.Transaction;
-//import com.bank.accountmanagementsystem.repositories.AccountRepository;
-//import com.bank.accountmanagementsystem.repositories.TransactionRepository;
-//import com.bank.accountmanagementsystem.services.TransactionStatementService;
 
 
 @Service
@@ -72,7 +67,6 @@ public class TransactionStatementServiceImpl implements TransactionStatementServ
 	}
 
 	public List<Transaction> listAll(long accountNumber, String date) {
-        // TODO Auto-generated method stub
         Optional<Account> result= accountRepository.findById(accountNumber);
         List<Transaction> transactionlist;
         if(result.isPresent()) {

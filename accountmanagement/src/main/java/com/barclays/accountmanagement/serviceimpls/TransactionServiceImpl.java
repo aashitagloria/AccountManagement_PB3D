@@ -21,6 +21,7 @@ import com.barclays.accountmanagement.repositories.TransactionRepo;
 import com.barclays.accountmanagement.services.TransactionService;
 import com.barclays.accountmanagement.utility.LoggingAspect;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -39,7 +40,6 @@ public class TransactionServiceImpl implements TransactionService {
 		transaction.setTransactionAmount(amount);
 		depositor.setCurrentBalance(depositor.getCurrentBalance() + amount);
 		transaction.setTransactionRefNum("T"+transaction.getTransactionId()+"-"+depositor.getAccountNumber());
-		//transaction.setTransactionRefNum("T"+depositor.getAccountNumber()+String.format("%d",transaction.getTransactionId()));
 		transaction.setDateTime(LocalDateTime.now());
 		transaction.setTransactionType("Credit");
 		transaction.setSubType("Deposit");
@@ -48,17 +48,14 @@ public class TransactionServiceImpl implements TransactionService {
 		
 		depositor.getTransactions().add(transaction);
 		
-		//transactionRepo.save(transaction);
+		
 		accountRepo.save(depositor);
-		GenerateTransactionRef(transaction,depositor);
-		//mail.sendEmail("jaypalkawale24@gmail.com", "Mail Generated from capstone", "MAil");
-		sendEmail(depositor, transaction);	
+		GenerateTransactionRef(transaction,depositor);	
 		return "Transaction successful";
 	}
 
 	
-	@Autowired
-    private JavaMailSender mailSender;
+	
 //Email Module
 	@Override
     public void sendEmail(Account account, Transaction transaction) {
@@ -66,9 +63,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         Customer customer = account.getCustomer();
         String emailId = customer.getEmail();
-        System.out.println(emailId);
-       // message.setFrom("acc.management.system@gmail.com");
-       // message.setTo(emailId);
         
         String firstEncryptedAccountNumber = Long.toString(account.getAccountNumber()).substring(0, 3); 
         String lastEncryptedAccountNumber = Long.toString(account.getAccountNumber()).substring(5, 9);
@@ -92,10 +86,9 @@ public class TransactionServiceImpl implements TransactionService {
         		"\nAmount transacted : $" + transaction.getTransactionAmount());
         String Subject=new String(subjectStart + " " + encryptedAccountNumber + " " +subjectEnd);
 
-        //mailSender.send(message);
+       
         mail.sendEmail(emailId, Subject, body);
-        
-        System.out.println("Mail sent...");
+        //logger.LOGGER.info("Mail Sent...");
     }
 //Withdraw Module		
 		@Override
@@ -133,10 +126,11 @@ public class TransactionServiceImpl implements TransactionService {
 			
 			try {
 				GenerateTransactionRef(transaction, account);
-				sendEmail(account, transaction);
+				//sendEmail(account, transaction);
 			}catch( Exception e ){
 				// catch error
-				System.out.println("Error Sending Email: " + e.getMessage());
+				logger.LOGGER.error("Error Sending Email"+e.getMessage());
+				//System.out.println("Error Sending Email: " + e.getMessage());
 			}
 			
 		    return getCurrentBalance(accountNumber);
@@ -164,13 +158,16 @@ public class TransactionServiceImpl implements TransactionService {
 			int parseCurrentDailyLimit = (int) currentDailyLimit;
 			
 			if(parseCurrentDailyLimit >= account.getDailyLimit()) {
-				System.out.println("cannot withdraw");
+				logger.LOGGER.info("Current Daily Limit Exccded");
+				
 				return false;
 			}else if(account.getDailyLimit() - amountToWithdraw >= 0 ) {
-				System.out.println("can withdraw");
+				//System.out.println("can withdraw");
+				logger.LOGGER.info("Can Withdraw");
 				return true;
 			}else {
-				System.out.println("cannot withdraw1");
+				logger.LOGGER.info("Cannot Withdraw");
+				//System.out.println("cannot withdraw1");
 				return false;
 			}
 	}
@@ -258,29 +255,23 @@ public class TransactionServiceImpl implements TransactionService {
 	public List<Transaction> checkHistory(long accountNum) {
 		Account account = accountRepo.getReferenceById(accountNum);
 		List<Transaction> transactionList = account.getTransactions();
+		List<Transaction>transactions=new ArrayList<Transaction>();
 		
 		
 		int sizeOfList = transactionList.size();
 		
 		if(sizeOfList > 5)
 		{
-			System.out.println(transactionList.get(sizeOfList-1).toString());
-			System.out.println(transactionList.get(sizeOfList-2).toString());
-			System.out.println(transactionList.get(sizeOfList-3).toString());
-			System.out.println(transactionList.get(sizeOfList-4).toString());
-			System.out.println(transactionList.get(sizeOfList-5).toString());
-//			return "Fetched history";
-			return transactionList;
+			for(int i=1;i<=5;i++)
+			{
+				transactions.add(transactionList.get(sizeOfList-i));
+			}
+		
+			return transactions;
 		}
 		else {
-			for(Transaction transaction : transactionList) {
-				System.out.println(transaction.toString());
-			}
-//			transactionList.add(null);
-//			return "Fetched history";
 			return transactionList;
 		}
-		//return "Unable to fetch history";
 	}
 	void GenerateTransactionRef(Transaction transaction,Account account) {
 		Page<Transaction> page = transactionRepo.findAll(PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "transactionId")));
@@ -295,7 +286,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 	void saveAndNotify(Account account,Transaction transaction) {
 		accountRepo.save(account);
-		//sendEmail(account, transaction);
+		sendEmail(account, transaction);
 	}
 
 

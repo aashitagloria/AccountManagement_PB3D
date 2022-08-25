@@ -18,9 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.barclays.accountmanagement.entity.Account;
 import com.barclays.accountmanagement.entity.Customer;
 import com.barclays.accountmanagement.entity.User;
+import com.barclays.accountmanagement.repositories.EmailSender;
 import com.barclays.accountmanagement.services.AccCreationEmailService;
 import com.barclays.accountmanagement.services.ManagerService;
 import com.barclays.accountmanagement.services.UserLoginService;
+import com.barclays.accountmanagement.utility.LoggingAspect;
 import com.barclays.accountmanagement.constants.SystemConstants;
 /**
  * ManagerController contains all api endpoints for manager functionalities.
@@ -32,15 +34,15 @@ public class ManagerController {
 	@Autowired
 	ManagerService managerService;
 
-	@Autowired
-	AccCreationEmailService accCreationEmailService;
 
+    @Autowired 
+    EmailSender mail;
 	@Autowired
 	UserLoginService userLoginService;
 
 	/**
 	 * create a new online account for customer
-	 * @author dakshin
+	 * 
 	 * 
 	 * @param panCard
 	 * @param aadharNumber
@@ -89,28 +91,35 @@ public class ManagerController {
 			newCust.setAadharImg(aadharImg.getBytes());
 			newCust.setPanImg(panImg.getBytes());
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			LoggingAspect.LOGGER.error(e.getMessage());
 			resultSet.put("message", e.getMessage());
 			return new ResponseEntity<>(resultSet, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		try {
-			newCust = managerService.createNewCustomer(newCust);
+			if(managerService.checkUserExist(newCust.getPanCard()))
+			{
+				newCust = managerService.createNewCustomer(newCust);
+				resultSet.put("customer_id", Long.toString(newCust.getCustomerId()));
+				String emailUserName = newUser.getUserId();
+				String emailPassword = newUser.getPassword();
+				String customerEmail = newCust.getEmail();
+				mail.sendEmail(customerEmail, "Temporary Credentials","UserName - "+emailUserName+"\n"+"Password -"+emailPassword);
+			}
+			else {
+				resultSet.put("message", "Customer Already Exist With Given Pan Card Number");
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+		
 			resultSet.put("message", e.getMessage());
 			return new ResponseEntity<>(resultSet, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		resultSet.put("customer_id", Long.toString(newCust.getCustomerId()));
-		String emailUserName = newUser.getUserId();
-		String emailPassword = newUser.getPassword();
-		String customerEmail = newCust.getEmail();
-		accCreationEmailService.sendEmail(emailUserName, emailPassword, customerEmail);
 		return new ResponseEntity<>(resultSet, HttpStatus.OK);
 	}
 
 	/**
 	 * Create savings account for a particular customer
-	 * @author nishad
+	 * @author 
 	 * 
 	 * @param customerId
 	 * @return accountNumber
@@ -123,7 +132,7 @@ public class ManagerController {
 			resultSet.put("customer_id", Integer.toString(customerId));
 			resultSet.put("account_number", Long.toString(account.getAccountNumber()));
 		} catch (Exception e) {
-			e.printStackTrace();
+			LoggingAspect.LOGGER.error(e.getMessage());
 			resultSet.put("message", e.getMessage());
 			return new ResponseEntity<>(resultSet, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
