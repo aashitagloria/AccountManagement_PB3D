@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.barclays.accountmanagement.constants.SystemConstants;
 
 import com.barclays.accountmanagement.entity.Transaction;
 import com.barclays.accountmanagement.services.TransactionService;
@@ -36,7 +37,7 @@ public class TransactionController {
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping("api/transaction/getCurrentBalance/{id}")
+	@RequestMapping(SystemConstants.GET_CURRENT_BALANCE)
 	public Long getCurrentBalance(@PathVariable long id) {
 		
 		Long currentBalance = transactionService.getCurrentBalance(id);
@@ -49,7 +50,7 @@ public class TransactionController {
 	 * @param amount
 	 * @return
 	 */
-	@GetMapping("api/transaction/withdraw/{id}/{amount}")
+	@GetMapping(SystemConstants.UPDATE_CURRENT_BALANCE)
 	public Long updateCurrentBalance(@PathVariable long id, @PathVariable long amount) {
 		
 		Long currentBalance = transactionService.DeductMoney(id,amount);
@@ -63,7 +64,7 @@ public class TransactionController {
 	 * @param amount
 	 * @return
 	 */
-	@PostMapping("api/transaction/deposit/{depositID}/{amount}")
+	@PostMapping(SystemConstants.DEPOSIT_MONEY)
 	public String DepositMoney(@PathVariable long depositID,@PathVariable double amount)
 	{
 		return transactionService.Deposit(depositID,amount);
@@ -75,7 +76,7 @@ public class TransactionController {
 	 * @param transferData
 	 * @return
 	 */
-	@PostMapping(value = "api/transaction/transfer")
+	@PostMapping(SystemConstants.TRANSFER_MONEY)
 	public String transferMoney(@RequestParam(value = "senderId") Integer SenderId,@RequestParam(value = "receiverId") Integer ReceiverId, 
 			@RequestParam(value = "amount") Integer amount )
 	{	
@@ -87,7 +88,7 @@ public class TransactionController {
 	 * @param accountNum
 	 * @return
 	 */
-	@GetMapping("api/transaction/recent/{accountNum}")
+	@GetMapping(SystemConstants.CHECK_HISTORY)
 	public List<Transaction> checkHistory(@PathVariable long accountNum)
 	{
 		return transactionService.checkHistory(accountNum);
